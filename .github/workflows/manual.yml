@@ -82,6 +82,22 @@ jobs:
       - name: Set Coverage URL
         run: |
           echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/$LATEST_MASTER_COMMIT" >> $GITHUB_ENV
+          
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'java/spring-boot/genhtml${{ github.sha }}'
 
   deploy:
     needs: build-and-coverage
@@ -91,19 +107,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'java/spring-boot/genhtml${{ github.sha }}'
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
