@@ -94,6 +94,9 @@ jobs:
         with:
           source: ./
           destination: ./_site
+      - name: Run Bazel Coverage
+        run: |
+          pwd
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
