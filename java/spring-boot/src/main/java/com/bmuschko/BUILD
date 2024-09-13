@@ -21,3 +21,15 @@ java_library(
     srcs = ["SampleCode2.java"],  # Use the filename only
     visibility = ["//src/test/func:__pkg__"],  # Allow visibility to the test package
 )
+
+java_library(
+    name = "sample_code_library3",
+    srcs = ["SampleCode3.java"],  # Use the filename only
+    visibility = ["//src/test/func:__pkg__"],  # Allow visibility to the test package
+)
+
+java_library(
+    name = "sample_code_library4",
+    srcs = ["SampleCode4.java"],  # Use the filename only
+    visibility = ["//src/test/func:__pkg__"],  # Allow visibility to the test package
+)

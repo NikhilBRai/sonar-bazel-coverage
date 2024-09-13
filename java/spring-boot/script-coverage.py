@@ -143,9 +143,13 @@ def main(commit_id, folder_path, lcov_report_path, output_lcov_path):
 
 if __name__ == '__main__':
     # Replace with your commit_id, folder_path, lcov_report_path, and output_lcov_path
-    commit_id = '6464cc4a6130b7da39dd8a70c82defb28282719a'
+    parser = argparse.ArgumentParser(description='Process git and coverage data.')
+    parser.add_argument('--commit_id', required=True, help='The commit ID to use for git diff')
+    #commit_id = 'd1477bb00e2ba538e6120a2141d429d2d4149254'
     folder_path = '/Users/nikhil.rai/personal-projects/sonar-bazel-coverage/java/spring-boot/src/main/java/com/bmuschko'
     lcov_report_path = '/Users/nikhil.rai/personal-projects/sonar-bazel-coverage/java/spring-boot/bazel-out/_coverage/_coverage_report.dat'
     output_lcov_path = '/Users/nikhil.rai/personal-projects/sonar-bazel-coverage/java/spring-boot/bazel-out/_coverage/filtered_coverage_report.dat'
 
-    main(commit_id, folder_path, lcov_report_path, output_lcov_path)
+    args = parser.parse_args()
+
+    main(args.commit_id, folder_path, lcov_report_path, output_lcov_path)
