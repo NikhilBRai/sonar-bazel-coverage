@@ -112,3 +112,4 @@ jobs:
         with:
           message: |
             https://nikhilbrai.github.io/sonar-bazel-coverage/${{ needs.build-and-coverage.outputs.latest-commit-message }}
+            ${{ needs.build-and-coverage.outputs.coverage-url }}
