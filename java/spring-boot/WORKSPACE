@@ -15,6 +15,7 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 maven_install(
     artifacts = [
         "org.springframework.boot:spring-boot-starter-web:2.1.5.RELEASE",
+        "junit:junit:4.13.1",
     ],
     repositories = [
         "https://jcenter.bintray.com",
