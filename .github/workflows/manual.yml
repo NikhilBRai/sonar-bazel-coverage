@@ -22,6 +22,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+      - name: Setup LCOV
+        uses: hrishikesh-kadam/setup-lcov@v1
 
       - name: Install bazelisk
         run: |
