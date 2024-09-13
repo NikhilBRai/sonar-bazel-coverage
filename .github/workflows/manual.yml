@@ -7,9 +7,19 @@ on:
     branches: [ master ]
 
 permissions:
-  contents: read
-  pages: write
   id-token: write
+  contents: write
+  actions: write
+  checks: write
+  deployments: write
+  discussions: write
+  issues: write
+  pages: read
+  packages: write
+  pull-requests: write
+  repository-projects: write
+  security-events: write
+  statuses: write
 
 concurrency:
   group: "pages"
@@ -52,19 +62,22 @@ jobs:
           bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
           LATEST_MASTER_COMMIT=$(git rev-parse origin/master)
           python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
-          genhtml --branch-coverage --output "genhtml$LATEST_MASTER_COMMIT" bazel-out/_coverage/filtered_coverage_report.dat
-
-      - name: Checkout gh-pages branch
-        run: |
-          git checkout gh-pages
-          git pull origin gh-pages
-
-      - name: Commit and push report to gh-pages
-        run: |
-          mv "genhtml$LATEST_MASTER_COMMIT" "java/spring-boot/genhtml$LATEST_MASTER_COMMIT"
-          git add "java/spring-boot/genhtml$LATEST_MASTER_COMMIT"
+          git checkout -b origin/gh-pages
+          pwd
+          genhtml --branch-coverage --output "genhtml$LATEST_MASTER_COMMIT" bazel-out/_coverage/filtered_coverage_report.dat 
+          git config --global user.name 'NikhilBRai'
+          git config --global user.email 'nikhilbrai@gmail.com'
+          git status
+          git add .
           git commit -m "Add coverage report for commit $LATEST_MASTER_COMMIT"
-          git push origin gh-pages
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
 
       - name: Set Coverage URL
         run: |
