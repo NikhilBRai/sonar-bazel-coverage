@@ -1,0 +1,29 @@
+name: DCG
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x]
+
+    steps:
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      - name: Checkout from PR branch  
+        uses: actions/checkout@v2
+        with: 
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Build and Deploy Script
+        working-directory: ${{ github.workspace }}/PROJECT_FOLDER
+        run: bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
