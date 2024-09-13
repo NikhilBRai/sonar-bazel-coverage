@@ -110,6 +110,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
