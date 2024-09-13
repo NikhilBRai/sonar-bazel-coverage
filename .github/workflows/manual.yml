@@ -27,9 +27,6 @@ concurrency:
 
 jobs:
   build-and-coverage:
-    environment:
-      name: github-pages
-      url: https://nikhilbrai.github.io/sonar-bazel-coverage/{{ github.sha }}
     runs-on: ubuntu-latest
 
     steps:
@@ -89,7 +86,7 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
-            https://nikhilbrai.github.io/sonar-bazel-coverage/{{ github.sha }}
+            https://nikhilbrai.github.io/sonar-bazel-coverage/
 
       - name: Checkout gh-pages branch
         uses: actions/checkout@v4
