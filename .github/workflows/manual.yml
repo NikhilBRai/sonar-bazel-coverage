@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: test
-      url: https://nikhilbrai.github.io/sonar-bazel-coverage/{{ github.sha }}
+      url: https://nikhilbrai.github.io/sonar-bazel-coverage/abcd/
 
     steps:
       - name: Checkout code
