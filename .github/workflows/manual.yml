@@ -83,24 +83,6 @@ jobs:
         run: |
           echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/{{ github.sha }}" >> $GITHUB_ENV
           
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./
-          destination: ./_site
-      - name: Run Bazel Coverage
-        run: |
-          pwd
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'java/spring-boot/genhtml${{ github.sha }}'
 
   deploy:
     needs: build-and-coverage
@@ -108,12 +90,15 @@ jobs:
       name: github-pages
       url: ${{ env.COVERAGE_URL }}
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout gh-pages branch
         uses: actions/checkout@v4
         with:
           ref: gh-pages
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'java/spring-boot/genhtml${{ github.sha }}'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
