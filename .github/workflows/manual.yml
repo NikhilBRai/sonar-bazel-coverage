@@ -87,11 +87,6 @@ jobs:
       - name: Set Coverage URL
         run: |
           echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/$LATEST_MASTER_COMMIT" >> $GITHUB_ENV
-      - name: Comment PR
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: |
-            https://nikhilbrai.github.io/sonar-bazel-coverage/$LATEST_MASTER_COMMIT
 
   deploy:
     needs: build-and-coverage
@@ -114,3 +109,8 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            https://nikhilbrai.github.io/sonar-bazel-coverage/${{ needs.build-and-coverage.outputs.latest-commit-message }}
