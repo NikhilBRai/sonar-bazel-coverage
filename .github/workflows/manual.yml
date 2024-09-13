@@ -19,6 +19,9 @@ jobs:
         with:
           java-version: '11'  # Specify the version of Java you need
           distribution: 'zulu'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
       - name: Install bazelisk
         run: |
@@ -27,10 +30,14 @@ jobs:
           mv bazelisk-linux-amd64 "${GITHUB_WORKSPACE}/bin/bazel"
           chmod +x "${GITHUB_WORKSPACE}/bin/bazel"
 
+      - name: Fetch master branch
+        run: git fetch origin master
+
       - name: Run Bazel Coverage
         run: |
           cd java/spring-boot
           bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
-          python script-coverage.py
+          LATEST_MASTER_COMMIT=$(git rev-parse origin/master)
+          python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
           genhtml --branch-coverage --output genhtml bazel-out/_coverage/filtered_coverage_report.dat
           
