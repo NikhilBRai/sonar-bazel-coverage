@@ -82,15 +82,7 @@ jobs:
       - name: Set Coverage URL
         run: |
           echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/{{ github.sha }}" >> $GITHUB_ENV
-          
 
-  deploy:
-    needs: build-and-coverage
-    environment:
-      name: github-pages
-      url: ${{ env.COVERAGE_URL }}
-    runs-on: ubuntu-latest
-    steps:
       - name: Checkout gh-pages branch
         uses: actions/checkout@v4
         with:
