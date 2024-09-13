@@ -27,6 +27,9 @@ concurrency:
 
 jobs:
   build-and-coverage:
+    environment:
+      name: github-pages
+      url: https://nikhilbrai.github.io/sonar-bazel-coverage/{{ github.sha }}
     runs-on: ubuntu-latest
 
     steps:
@@ -82,6 +85,11 @@ jobs:
       - name: Set Coverage URL
         run: |
           echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/{{ github.sha }}" >> $GITHUB_ENV
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            https://nikhilbrai.github.io/sonar-bazel-coverage/{{ github.sha }}
 
       - name: Checkout gh-pages branch
         uses: actions/checkout@v4
