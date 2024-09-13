@@ -24,4 +24,4 @@ jobs:
         working-directory: ${{ github.workspace }}/PROJECT_FOLDER
         run: |
           cd java/spring-boot
-          bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
+          
