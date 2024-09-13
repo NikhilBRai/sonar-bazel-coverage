@@ -28,6 +28,9 @@ concurrency:
 jobs:
   build-and-coverage:
     runs-on: ubuntu-latest
+    environment:
+      name: test
+      url: https://nikhilbrai.github.io/sonar-bazel-coverage/{{ github.sha }}
 
     steps:
       - name: Checkout code
