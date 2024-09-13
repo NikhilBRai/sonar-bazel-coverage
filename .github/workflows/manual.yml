@@ -30,6 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       latest-commit-message: ${{ steps.run-bazel.outputs.LATEST_MASTER_COMMIT }}
+      coverage-url: ${{ steps.run-bazel.outputs.COVERAGE_URL }}
 
     steps:
       - name: Checkout code
@@ -66,6 +67,7 @@ jobs:
           LATEST_MASTER_COMMIT=$(git rev-parse origin/master)
           echo "LATEST_MASTER_COMMIT=$LATEST_MASTER_COMMIT" >> $GITHUB_ENV
           echo "LATEST_MASTER_COMMIT=$LATEST_MASTER_COMMIT" >> $GITHUB_OUTPUT
+          echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/$LATEST_MASTER_COMMIT" >> $GITHUB_OUTPUT
           python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
           git checkout -b origin/gh-pages
           pwd
@@ -84,15 +86,11 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
 
-      - name: Set Coverage URL
-        run: |
-          echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/$LATEST_MASTER_COMMIT" >> $GITHUB_ENV
-
   deploy:
     needs: build-and-coverage
     environment:
       name: github-pages
-      url: ${{ env.COVERAGE_URL }}
+      url: ${{ needs.build-and-coverage.outputs.coverage-url }}
     runs-on: ubuntu-latest
 
     steps:
