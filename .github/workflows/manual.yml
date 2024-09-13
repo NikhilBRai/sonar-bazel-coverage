@@ -22,4 +22,6 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Build and Deploy Script
         working-directory: ${{ github.workspace }}/PROJECT_FOLDER
-        run: bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
+        run: |
+          cd java/spring-boot
+          bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
