@@ -11,8 +11,6 @@ permissions:
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -30,9 +28,11 @@ jobs:
         with:
           java-version: '11'  # Specify the version of Java you need
           distribution: 'zulu'
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+
       - name: Setup LCOV
         uses: hrishikesh-kadam/setup-lcov@v1
 
@@ -53,28 +53,44 @@ jobs:
           LATEST_MASTER_COMMIT=$(git rev-parse origin/master)
           python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
           genhtml --branch-coverage --output "genhtml$LATEST_MASTER_COMMIT" bazel-out/_coverage/filtered_coverage_report.dat
+
+      - name: Checkout gh-pages branch
+        run: |
           git checkout gh-pages
-          git commit -m "$LATEST_MASTER_COMMIT"
+          git pull origin gh-pages
+
+      - name: Commit and push report to gh-pages
+        run: |
+          mv "genhtml$LATEST_MASTER_COMMIT" "java/spring-boot/genhtml$LATEST_MASTER_COMMIT"
+          git add "java/spring-boot/genhtml$LATEST_MASTER_COMMIT"
+          git commit -m "Add coverage report for commit $LATEST_MASTER_COMMIT"
           git push origin gh-pages
-          COVERAGE_URL="https://NikhilBRai.github.io/sonar-bazel-coverage/genhtml$LATEST_MASTER_COMMIT/index.html"
+
+      - name: Set Coverage URL
+        run: |
+          echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/$LATEST_MASTER_COMMIT" >> $GITHUB_ENV
+
   deploy:
+    needs: build-and-coverage
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ env.COVERAGE_URL }}
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout gh-pages branch
         uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Upload artifact
+
+      - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: 'java/spring-boot/genhtml'
+          path: 'java/spring-boot/genhtml${{ github.sha }}'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-
-          
