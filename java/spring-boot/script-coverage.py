@@ -147,9 +147,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process git and coverage data.')
     parser.add_argument('--commit_id', required=True, help='The commit ID to use for git diff')
     #commit_id = 'd1477bb00e2ba538e6120a2141d429d2d4149254'
-    folder_path = 'java/spring-boot/src/main/java/com/bmuschko'
-    lcov_report_path = 'java/spring-boot/bazel-out/_coverage/_coverage_report.dat'
-    output_lcov_path = 'java/spring-boot/bazel-out/_coverage/filtered_coverage_report.dat'
+    folder_path = 'src/main/java/com/bmuschko'
+    lcov_report_path = 'bazel-out/_coverage/_coverage_report.dat'
+    output_lcov_path = 'bazel-out/_coverage/filtered_coverage_report.dat'
 
     args = parser.parse_args()
 
