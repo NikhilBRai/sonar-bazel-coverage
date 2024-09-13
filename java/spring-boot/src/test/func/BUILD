@@ -1,0 +1,10 @@
+java_test(
+    name = "sample_code_test",
+    srcs = ["SampleCodeTest.java"],
+    deps = [
+        "//src/main/java/com/bmuschko:sample_code_library",  # Dependency on the library target
+        "@maven//:junit_junit",
+    ],
+    test_class = "func.SampleCodeTest",
+    javacopts = ["-g"],
+)

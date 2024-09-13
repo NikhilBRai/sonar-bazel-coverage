@@ -1,0 +1,1 @@
+genhtml --branch-coverage --output genhtml bazel-out/_coverage/_coverage_report.dat

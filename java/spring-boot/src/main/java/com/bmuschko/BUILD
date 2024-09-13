@@ -9,3 +9,9 @@ java_binary(
         "@maven//:org_springframework_spring_web",
     ],
 )
+
+java_library(
+    name = "sample_code_library",
+    srcs = ["SampleCode.java"],  # Use the filename only
+    visibility = ["//src/test/func:__pkg__"],  # Allow visibility to the test package
+)
