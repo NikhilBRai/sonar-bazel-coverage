@@ -31,4 +31,6 @@ jobs:
         run: |
           cd java/spring-boot
           bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
+          python script-coverage.py
+          genhtml --branch-coverage --output genhtml bazel-out/_coverage/filtered_coverage_report.dat
           
