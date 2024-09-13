@@ -29,4 +29,5 @@ jobs:
 
       - name: Run Bazel Coverage
         run: |
-          pwd
+          bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
+          
