@@ -28,6 +28,8 @@ concurrency:
 jobs:
   build-and-coverage:
     runs-on: ubuntu-latest
+    outputs:
+      latest-commit-message: ${{ steps.run-bazel.outputs.LATEST_MASTER_COMMIT }}
 
     steps:
       - name: Checkout code
@@ -57,11 +59,13 @@ jobs:
         run: git fetch origin master
 
       - name: Run Bazel Coverage
+        id: run-bazel
         run: |
           cd java/spring-boot
           bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
           LATEST_MASTER_COMMIT=$(git rev-parse origin/master)
           echo "LATEST_MASTER_COMMIT=$LATEST_MASTER_COMMIT" >> $GITHUB_ENV
+          echo "LATEST_MASTER_COMMIT=$LATEST_MASTER_COMMIT" >> $GITHUB_OUTPUT
           python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
           git checkout -b origin/gh-pages
           pwd
@@ -87,7 +91,7 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
-            https://nikhilbrai.github.io/sonar-bazel-coverage/
+            https://nikhilbrai.github.io/sonar-bazel-coverage/$LATEST_MASTER_COMMIT
 
   deploy:
     needs: build-and-coverage
@@ -105,7 +109,7 @@ jobs:
       - name: Upload artifact to dynamically generated folder
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "java/spring-boot/genhtml-${{ env.LATEST_MASTER_COMMIT }}"  # Upload to a directory named by the commit SHA
+          path: "java/spring-boot/genhtml-${{ needs.build-and-coverage.outputs.latest-commit-message }}"  # Upload to a directory named by the commit SHA
 
       - name: Deploy to GitHub Pages
         id: deployment
