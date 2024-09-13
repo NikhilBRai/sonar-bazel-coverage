@@ -4,11 +4,10 @@ import os
 
 def get_git_diff_lines(commit_id, folder_path):
     """
-    Get the lines that were added/modified in the specified commit and folder path using git diff.
+    Get the lines that were changed in the specified commit and folder path using git diff.
     Returns a dictionary where the keys are file paths and the values are sets of line numbers.
     """
-    # Run the git diff command to get the changes made in the specified commit
-    command = ['git', 'diff', commit_id, '--numstat', '--', folder_path]
+    command = ['git', 'diff', commit_id, '--unified=0', '--', folder_path]
     result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
 
     if result.returncode != 0:
@@ -16,17 +15,32 @@ def get_git_diff_lines(commit_id, folder_path):
 
     diff_lines = result.stdout
     changes = {}
+    filename = ""
+    changes_set = set()
+    prev_line_num = None
+    line_num = 1
 
-    # Parse the git diff output
     for line in diff_lines.splitlines():
         if line.startswith('diff --git'):
-            continue
-        parts = line.split()
-        if len(parts) == 3:
-            # We expect something like "M       src/main/java/com/bmuschko/SampleCode.java"
-            added, removed, filepath = parts
-            if added.isdigit():
-                changes[filepath] = set(range(1, int(added) + 1))
+            if filename and changes_set and filename.endswith('.java'):
+                changes[filename] = list(changes_set)
+            filename = re.sub(r'^a/', '', line.split()[2])
+            changes_set = set()
+        elif line.startswith('@@ '):
+            match = re.search(r'\+(\d+)', line)
+            if match:
+                line_num = int(match.group(1))
+        elif line.startswith('+') and not (line.startswith('+++') or line.startswith('---')):
+            if changes_set:
+                if line_num != prev_line_num:
+                    changes_set.add(line_num)
+            else:
+                changes_set.add(line_num)
+            prev_line_num = line_num
+            line_num += 1
+
+    if filename and changes_set and filename.endswith('.java'):
+        changes[filename] = list(changes_set)
 
     return changes
 
@@ -48,21 +62,13 @@ def parse_lcov_report(lcov_report_path):
             line = line.strip()
             if line.startswith('SF:'):
                 current_file = line[3:]
-                coverage_record = {'DA': [], 'FN': [], 'FNDA': [], 'FNF': 0, 'FNH': 0, 'LH': 0, 'LF': 0}
+                coverage_record = {'DA': [], 'LH': 0, 'LF': 0}
                 coverage_data[current_file] = coverage_record
             elif line.startswith('DA:'):
                 parts = line[3:].split(',')
                 line_number = int(parts[0])
                 coverage_hits = int(parts[1])
                 coverage_record['DA'].append((line_number, coverage_hits))
-            elif line.startswith('FN:'):
-                coverage_record['FN'].append(line[3:])
-            elif line.startswith('FNDA:'):
-                coverage_record['FNDA'].append(line[5:])
-            elif line.startswith('FNF:'):
-                coverage_record['FNF'] = int(line[4:])
-            elif line.startswith('FNH:'):
-                coverage_record['FNH'] = int(line[4:])
             elif line.startswith('LH:'):
                 coverage_record['LH'] = int(line[3:])
             elif line.startswith('LF:'):
@@ -90,10 +96,6 @@ def filter_lcov_by_git_diff(git_diff_changes, coverage_data):
 
                 if filtered_da:
                     filtered_coverage[cd] = {
-                        'FN': data['FN'],
-                        'FNDA': data['FNDA'],
-                        'FNF': data['FNF'],
-                        'FNH': data['FNH'],
                         'DA': filtered_da,
                         'LH': filtered_lh,
                         'LF': filtered_lf
@@ -109,16 +111,6 @@ def save_filtered_lcov_report(filtered_coverage, output_path):
     with open(output_path, 'w') as f:
         for file, data in filtered_coverage.items():
             f.write(f'SF:{file}\n')
-
-            # Write function names and hits
-            for fn in data['FN']:
-                f.write(f'FN:{fn}\n')
-            for fnda in data['FNDA']:
-                f.write(f'FNDA:{fnda}\n')
-
-            # Write function statistics
-            f.write(f'FNF:{data["FNF"]}\n')
-            f.write(f'FNH:{data["FNH"]}\n')
 
             # Write DA (line coverage)
             for line, hits in data['DA']:
@@ -151,7 +143,7 @@ def main(commit_id, folder_path, lcov_report_path, output_lcov_path):
 
 if __name__ == '__main__':
     # Replace with your commit_id, folder_path, lcov_report_path, and output_lcov_path
-    commit_id = 'bb6e11146a195ffe74acc1aa9a5fd5cee4b29fc8'
+    commit_id = 'd65dcf573d384f267473d7691ad288a6a0709890'
     folder_path = '/Users/nikhil.rai/personal-projects/sonar-bazel-coverage/java/spring-boot/src/main/java/com/bmuschko'
     lcov_report_path = '/Users/nikhil.rai/personal-projects/sonar-bazel-coverage/java/spring-boot/bazel-out/_coverage/_coverage_report.dat'
     output_lcov_path = '/Users/nikhil.rai/personal-projects/sonar-bazel-coverage/java/spring-boot/bazel-out/_coverage/filtered_coverage_report.dat'
