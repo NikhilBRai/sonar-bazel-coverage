@@ -61,7 +61,7 @@ jobs:
           cd java/spring-boot
           bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
           LATEST_MASTER_COMMIT=$(git rev-parse origin/master)
-          python script-coverage.py --commit_id "{{ github.sha }}"
+          python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
           git checkout -b origin/gh-pages
           pwd
           genhtml --branch-coverage --output "genhtml${{ github.sha }}" bazel-out/_coverage/filtered_coverage_report.dat 
