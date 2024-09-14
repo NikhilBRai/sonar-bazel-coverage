@@ -67,7 +67,7 @@ jobs:
           LATEST_MASTER_COMMIT=$(git rev-parse origin/master)
           echo "LATEST_MASTER_COMMIT=$LATEST_MASTER_COMMIT" >> $GITHUB_ENV
           echo "LATEST_MASTER_COMMIT=$LATEST_MASTER_COMMIT" >> $GITHUB_OUTPUT
-          echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/$LATEST_MASTER_COMMIT" >> $GITHUB_OUTPUT
+          echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/${{ github.event.number }}" >> $GITHUB_OUTPUT
           python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
           git checkout -b origin/gh-pages
           pwd
