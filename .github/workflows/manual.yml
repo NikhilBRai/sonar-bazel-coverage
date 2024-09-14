@@ -70,7 +70,7 @@ jobs:
           echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/${{ github.event.number }}" >> $GITHUB_OUTPUT
           python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
           git checkout -b origin/gh-pages
-          pwd
+          cat filtered_coverage_report.dat
           genhtml --branch-coverage --output "genhtml/${{ github.event.number }}" bazel-out/_coverage/filtered_coverage_report.dat 
           git config --global user.name 'NikhilBRai'
           git config --global user.email 'nikhilbrai@gmail.com'
