@@ -7,9 +7,19 @@ on:
     branches: [ master ]
 
 permissions:
-  contents: read
-  pages: write
   id-token: write
+  contents: write
+  actions: write
+  checks: write
+  deployments: write
+  discussions: write
+  issues: write
+  pages: write
+  packages: write
+  pull-requests: write
+  repository-projects: write
+  security-events: write
+  statuses: write
 
 concurrency:
   group: "pages"
@@ -18,6 +28,9 @@ concurrency:
 jobs:
   build-and-coverage:
     runs-on: ubuntu-latest
+    outputs:
+      latest-commit-message: ${{ steps.run-bazel.outputs.LATEST_MASTER_COMMIT }}
+      coverage-url: ${{ steps.run-bazel.outputs.COVERAGE_URL }}
 
     steps:
       - name: Checkout code
@@ -47,34 +60,37 @@ jobs:
         run: git fetch origin master
 
       - name: Run Bazel Coverage
+        id: run-bazel
         run: |
           cd java/spring-boot
           bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
           LATEST_MASTER_COMMIT=$(git rev-parse origin/master)
+          echo "LATEST_MASTER_COMMIT=$LATEST_MASTER_COMMIT" >> $GITHUB_ENV
+          echo "LATEST_MASTER_COMMIT=$LATEST_MASTER_COMMIT" >> $GITHUB_OUTPUT
+          echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/$LATEST_MASTER_COMMIT" >> $GITHUB_OUTPUT
           python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
-          genhtml --branch-coverage --output "genhtml$LATEST_MASTER_COMMIT" bazel-out/_coverage/filtered_coverage_report.dat
-
-      - name: Checkout gh-pages branch
-        run: |
-          git checkout gh-pages
-          git pull origin gh-pages
-
-      - name: Commit and push report to gh-pages
-        run: |
-          mv "genhtml$LATEST_MASTER_COMMIT" "java/spring-boot/genhtml$LATEST_MASTER_COMMIT"
-          git add "java/spring-boot/genhtml$LATEST_MASTER_COMMIT"
+          git checkout -b origin/gh-pages
+          pwd
+          genhtml --branch-coverage --output "genhtml/${{ github.event.number }}" bazel-out/_coverage/filtered_coverage_report.dat 
+          git config --global user.name 'NikhilBRai'
+          git config --global user.email 'nikhilbrai@gmail.com'
+          git status
+          git add .
           git commit -m "Add coverage report for commit $LATEST_MASTER_COMMIT"
-          git push origin gh-pages
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
 
-      - name: Set Coverage URL
-        run: |
-          echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/$LATEST_MASTER_COMMIT" >> $GITHUB_ENV
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
 
   deploy:
     needs: build-and-coverage
     environment:
       name: github-pages
-      url: ${{ env.COVERAGE_URL }}
+      url: ${{ needs.build-and-coverage.outputs.coverage-url }}
     runs-on: ubuntu-latest
 
     steps:
@@ -83,14 +99,16 @@ jobs:
         with:
           ref: gh-pages
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact for GitHub Pages
+      - name: Upload artifact to dynamically generated folder
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'java/spring-boot/genhtml${{ github.sha }}'
+          path: "java/spring-boot/genhtml"  # Upload to a directory named by the commit SHA
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            ${{ needs.build-and-coverage.outputs.coverage-url }}
