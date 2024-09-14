@@ -71,7 +71,7 @@ jobs:
           python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
           git checkout -b origin/gh-pages
           pwd
-          genhtml --branch-coverage --output "genhtml/$LATEST_MASTER_COMMIT" bazel-out/_coverage/filtered_coverage_report.dat 
+          genhtml --branch-coverage --output "genhtml/${{ github.event.number }}" bazel-out/_coverage/filtered_coverage_report.dat 
           git config --global user.name 'NikhilBRai'
           git config --global user.email 'nikhilbrai@gmail.com'
           git status
@@ -111,5 +111,4 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
-            https://nikhilbrai.github.io/sonar-bazel-coverage/${{ needs.build-and-coverage.outputs.latest-commit-message }}
             ${{ needs.build-and-coverage.outputs.coverage-url }}
