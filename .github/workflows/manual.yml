@@ -71,7 +71,7 @@ jobs:
           python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
           git checkout -b origin/gh-pages
           pwd
-          genhtml --branch-coverage --output "genhtml$LATEST_MASTER_COMMIT" bazel-out/_coverage/filtered_coverage_report.dat 
+          genhtml --branch-coverage --output "genhtml/$LATEST_MASTER_COMMIT" bazel-out/_coverage/filtered_coverage_report.dat 
           git config --global user.name 'NikhilBRai'
           git config --global user.email 'nikhilbrai@gmail.com'
           git status
@@ -102,7 +102,7 @@ jobs:
       - name: Upload artifact to dynamically generated folder
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "java/spring-boot/genhtml${{ needs.build-and-coverage.outputs.latest-commit-message }}"  # Upload to a directory named by the commit SHA
+          path: "java/spring-boot/genhtml/${{ needs.build-and-coverage.outputs.latest-commit-message }}"  # Upload to a directory named by the commit SHA
 
       - name: Deploy to GitHub Pages
         id: deployment
