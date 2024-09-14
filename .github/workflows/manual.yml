@@ -69,11 +69,10 @@ jobs:
           echo "LATEST_MASTER_COMMIT=$LATEST_MASTER_COMMIT" >> $GITHUB_OUTPUT
           echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/${{ github.event.number }}/${{ github.sha }}" >> $GITHUB_OUTPUT
           python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
+          genhtml --branch-coverage --output "genhtml/${{ github.event.number }}/${{ github.sha }}" bazel-out/_coverage/filtered_coverage_report.dat
           git fetch origin gh-pages:gh-pages
           git checkout gh-pages
-          chmod -R 777 src/main/java/com/bmuschko
-          cat bazel-out/_coverage/filtered_coverage_report.dat
-          genhtml --branch-coverage --output "genhtml/${{ github.event.number }}/${{ github.sha }}" bazel-out/_coverage/filtered_coverage_report.dat 
+          cat bazel-out/_coverage/filtered_coverage_report.dat 
           git config --global user.name 'NikhilBRai'
           git config --global user.email 'nikhilbrai@gmail.com'
           git status
