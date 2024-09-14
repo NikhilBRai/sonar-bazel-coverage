@@ -10,6 +10,6 @@ public class SampleCode4 {
     public Boolean sampleMethod2() {
         System.out.println("Hey1");
         System.out.println("Hey3");
-        return true;
+        return false;
     }
 }
