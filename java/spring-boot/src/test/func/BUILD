@@ -6,6 +6,8 @@ java_test(
         "//src/main/java/com/bmuschko:sample_code_library2",
         "//src/main/java/com/bmuschko:sample_code_library3",  # Dependency on the library target
         "//src/main/java/com/bmuschko:sample_code_library4",
+        "//src/main/java/com/bmuschko:sample_code_library5",
+        "//src/main/java/com/bmuschko:sample_code_library6",
         "@maven//:junit_junit",
     ],
     test_class = "func.SampleCodeTest",

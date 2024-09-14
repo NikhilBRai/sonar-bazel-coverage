@@ -63,6 +63,7 @@ jobs:
         id: run-bazel
         run: |
           cd java/spring-boot
+          chmod -R 777 src/main/java/com/bmuschko
           bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
           LATEST_MASTER_COMMIT=$(git rev-parse origin/master)
           echo "LATEST_MASTER_COMMIT=$LATEST_MASTER_COMMIT" >> $GITHUB_ENV

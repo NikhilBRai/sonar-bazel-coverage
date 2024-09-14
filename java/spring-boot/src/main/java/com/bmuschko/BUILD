@@ -39,3 +39,9 @@ java_library(
     srcs = ["SampleCode5.java"],  # Use the filename only
     visibility = ["//src/test/func:__pkg__"],  # Allow visibility to the test package
 )
+
+java_library(
+    name = "sample_code_library6",
+    srcs = ["SampleCode6.java"],  # Use the filename only
+    visibility = ["//src/test/func:__pkg__"],  # Allow visibility to the test package
+)
