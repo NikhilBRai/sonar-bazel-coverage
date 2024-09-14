@@ -1,9 +1,6 @@
 package func;
 
-import com.bmuschko.SampleCode;
-import com.bmuschko.SampleCode2;
-import com.bmuschko.SampleCode3;
-import com.bmuschko.SampleCode4;
+import com.bmuschko.*;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,6 +36,14 @@ public class SampleCodeTest {
     public void testingMethod4() {
         //assertTrue(true);
         SampleCode4 s = new SampleCode4();
+        assertEquals(s.sampleMethod(), false);
+    }
+
+    @Test
+    public void testingMethod5() {
+        //assertTrue(true);
+        SampleCode5 s = new SampleCode5();
         assertEquals(s.sampleMethod(), true);
     }
+
 }
