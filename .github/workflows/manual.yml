@@ -65,13 +65,14 @@ jobs:
           cd java/spring-boot
           bazel coverage --instrumentation_filter="^//src[/:]" //src/test/func:sample_code_test --combined_report=lcov
           LATEST_MASTER_COMMIT=$(git rev-parse origin/master)
+          CURRENT_COMMIT_MESSAGE=$(git rev-parse origin/${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})
           echo "LATEST_MASTER_COMMIT=$LATEST_MASTER_COMMIT" >> $GITHUB_ENV
           echo "LATEST_MASTER_COMMIT=$LATEST_MASTER_COMMIT" >> $GITHUB_OUTPUT
-          echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/${{ github.event.number }}/$LATEST_MASTER_COMMIT" >> $GITHUB_OUTPUT
+          echo "COVERAGE_URL=https://nikhilbrai.github.io/sonar-bazel-coverage/${{ github.event.number }}/$CURRENT_COMMIT_MESSAGE" >> $GITHUB_OUTPUT
           python script-coverage.py --commit_id "$LATEST_MASTER_COMMIT"
           git checkout -b origin/gh-pages
           cat bazel-out/_coverage/filtered_coverage_report.dat
-          genhtml --branch-coverage --output "genhtml/${{ github.event.number }}/$LATEST_MASTER_COMMIT" bazel-out/_coverage/filtered_coverage_report.dat 
+          genhtml --branch-coverage --output "genhtml/${{ github.event.number }}/$CURRENT_COMMIT_MESSAGE" bazel-out/_coverage/filtered_coverage_report.dat 
           git config --global user.name 'NikhilBRai'
           git config --global user.email 'nikhilbrai@gmail.com'
           git status
